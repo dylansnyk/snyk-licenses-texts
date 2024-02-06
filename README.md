@@ -55,6 +55,16 @@ Example usage:
   ```
   See the relevant TypeScript types in the repo for full information.
 
+## Including Copyrights
+
+Optionally add `--includeCopyright=true` to use copyright data pull from https://clearlydefined.io. 
+
+Example usage:
+
+```
+snyk-licenses-report generate --orgPublicId=your-org-id --includeCopyright=true
+```
+
 ## Development setup
 - `npm i`
 - `npm run test` (requires `TEST_ORG_ID` & `SNYK_TEST_TOKEN` from 1 password)

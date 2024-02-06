@@ -3,6 +3,7 @@ export interface Dependency {
   name: string;
   version: string;
   packageManager: string;
+  copyright?: string[]
 }
 
 export type LicenseSeverity = 'none' | 'critical' | 'high' | 'medium' | 'low';

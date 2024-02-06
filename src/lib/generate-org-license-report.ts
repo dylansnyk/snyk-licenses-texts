@@ -15,6 +15,7 @@ import {
   Dependency,
   DependencyData,
 } from './types';
+import { getCopyrightDataFromDependency } from './get-copyright';
 
 const debug = debugLib('snyk-licenses:generateOrgLicensesReport');
 
@@ -25,6 +26,7 @@ export interface LicenseReportData {
 export async function generateLicenseData(
   orgPublicId: string,
   options?: {
+    includeCopyright?: boolean;
     filters?: {
       projects: string[];
     };
@@ -62,6 +64,7 @@ export async function generateLicenseData(
     licenseReportData = await mergeLicenceAndDepData(
       licenseData,
       dependenciesData,
+      options.includeCopyright
     );
     debug(`✅ Done processing ${licenseData.total} licenses`);
 
@@ -72,11 +75,24 @@ export async function generateLicenseData(
   }
 }
 
-export function enrichDependencies(
+export async function enrichDependencies(
   dependencies: Dependency[],
   dependenciesData,
-): EnrichedDependency[] {
+  includeCopyright = false
+): Promise<EnrichedDependency[]> {
   const enrichDependencies: EnrichedDependency[] = [];
+  
+  if (includeCopyright) {
+    const copyrightRequests = []
+
+    for (const dependency of dependencies) {
+      copyrightRequests.push(getCopyrightDataFromDependency(dependency)
+        .then(depCopyrights => dependency.copyright = depCopyrights))
+    }
+  
+    await Promise.all(copyrightRequests)
+  }
+
   for (const dependency of dependencies) {
     const dep: DependencyData[] = dependenciesData[dependency.id];
     if (dep && dep[0]) {
@@ -114,6 +130,7 @@ async function getLicenseTextAndUrl(
 export async function mergeLicenceAndDepData(
   licenseData: snykApiSdk.OrgTypes.LicensesPostResponseType,
   dependenciesData,
+  includeCopyright = false
 ): Promise<LicenseReportData> {
   const licenseReportData: LicenseReportData = {};
 
@@ -124,9 +141,10 @@ export async function mergeLicenceAndDepData(
     if (!dependencies.length) {
       continue;
     }
-    const dependenciesEnriched = enrichDependencies(
+    const dependenciesEnriched = await enrichDependencies(
       dependencies,
       dependenciesData,
+      includeCopyright
     );
     if (dependenciesEnriched.length) {
       license.dependencies = dependenciesEnriched;

@@ -57,6 +57,10 @@ export const builder = {
     desc:
       'Project ID to filter the results by. E.g. --project=uuid --project=uuid2',
   },
+  includeCopyright: {
+    default: false,
+    desc: "Include copyright data from https://clearlydefined.io"
+  }
 };
 export const aliases = ['g'];
 
@@ -70,6 +74,7 @@ export async function handler(argv: GenerateOptions) {
       view,
       project,
       excludeSnykFields = false,
+      includeCopyright = false,
     } = argv;
     debug(
       'ℹ️  Options: ' +
@@ -79,11 +84,13 @@ export async function handler(argv: GenerateOptions) {
           template,
           view,
           project: _.castArray(project),
+          includeCopyright: includeCopyright
         }),
     );
     getApiToken();
     const orgData = await getOrgData(orgPublicId);
     const options = {
+      includeCopyright: includeCopyright,
       filters: {
         projects: _.castArray(project),
       },
@@ -124,6 +131,7 @@ interface GenerateOptions {
   view: SupportedViews;
   project?: string | string[];
   excludeSnykFields?: boolean;
+  includeCopyright?: boolean;
 }
 function validateOptions(argv: GenerateOptions) {
   const { view, excludeSnykFields = false } = argv;
