@@ -43,7 +43,7 @@
     "lodash": "4.17.21",
     "node-fetch": "2.6.7",
     "p-map": "5.5.0",
-    "puppeteer": "18.2.1",
+    "puppeteer": "22.11.2",
     "snyk-api-ts-client": "1.10.0",
     "snyk-config": "5.1.0",
     "snyk-request-manager": "1.8.0",
